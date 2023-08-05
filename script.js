@@ -11,8 +11,8 @@ let operator;
 
 mainSc.innerText = getBuffer();
 
-numberBtns.forEach((numberBtns) => {
-    numberBtns.onclick = (e) => {
+numberBtns.forEach((btn) => {
+    btn.onclick = (e) => {
         handleNumberClick(e.target.innerText);
         mainSc.innerText = getBuffer();
         handleOverflow(mainSc, 48);
@@ -20,8 +20,8 @@ numberBtns.forEach((numberBtns) => {
     };
 });
 
-symbolBtns.forEach((symbolBtn) => {
-    symbolBtn.onclick = (e) => {
+symbolBtns.forEach((btn) => {
+    btn.onclick = (e) => {
         handleSymbolClick(e.target.innerText);
         mainSc.innerText = getBuffer();
         handleOverflow(mainSc, 48);
@@ -30,21 +30,27 @@ symbolBtns.forEach((symbolBtn) => {
 
 function handleNumberClick(num) {
     if (isFirstValue) {
-        if (firstValue == "0") {
-            firstValue = num;
-        } else if (firstValue == "-0") {
-            firstValue = "-" + num;
-        } else {
-            firstValue += num;
-        }
+        firstValue = setValue(firstValue, num);
     } else {
-        secondValue += num;
+        secondValue = setValue(secondValue, num);
     }
+}
+
+function setValue(value, num) {
+    if (value == "0") {
+        return num;
+    }
+
+    if (value == "-0") {
+        return "-" + num;
+    }
+
+    return value + num;
 }
 
 function handleSymbolClick(symbol) {
     switch (symbol) {
-        case "AC":
+        case "C":
             isFirstValue = true;
             firstValue = "0";
             secondValue = "";
@@ -69,7 +75,6 @@ function handleSymbolClick(symbol) {
                 if (firstValue == "-") firstValue += "0";
                 subSc.innerText = "";
             }
-
             operator = symbol;
             break;
 
@@ -90,9 +95,10 @@ function handleSymbolClick(symbol) {
 
         case "%":
             if (isFirstValue) {
-                if (!isNaN(firstValue)) firstValue = parseFloat(firstValue) / 100;
-            } else if (secondValue) {
-                if (!isNaN(secondValue)) secondValue = parseFloat(secondValue) / 100;
+                firstValue = percent(firstValue);
+            } else {
+                if (!secondValue) secondValue = "0";
+                secondValue = percent(secondValue);
             }
             subSc.innerText = "";
             break;
@@ -101,6 +107,7 @@ function handleSymbolClick(symbol) {
             if (isFirstValue) {
                 firstValue = toggleSign(firstValue);
             } else {
+                if (!secondValue) secondValue = "0";
                 secondValue = toggleSign(secondValue);
             }
             subSc.innerText = "";
@@ -110,7 +117,8 @@ function handleSymbolClick(symbol) {
             if (isFirstValue) {
                 firstValue = setFloat(firstValue);
             } else {
-                if (secondValue) secondValue = setFloat(secondValue);
+                if (!secondValue) secondValue = "0";
+                secondValue = setFloat(secondValue);
             }
             subSc.innerText = "";
             break;
@@ -154,14 +162,14 @@ function calculate(num1, num2, operator) {
 
     if (result.includes(".")) {
         const arr = result.split(".");
-        if (arr[1].length > 6 && parseInt(arr[1]) !== "0") {
+        if (arr[1].length > 6) {
             arr[1] = parseFloat("0." + arr[1]).toFixed(6);
             arr[1] = arr[1].replace("0.", ".");
             result = arr[0] + arr[1];
         }
     }
 
-    return result;
+    return parseFloat(result);
 }
 
 function handleOverflow(el, maxFs) {
@@ -181,22 +189,26 @@ function handleOverflow(el, maxFs) {
 }
 
 function toggleSign(value) {
-    if (value == "0") {
-        value = "-" + value;
-    } else {
-        if (!isNaN(value)) value = -parseFloat(value);
+    if (value == 0) {
+        return "-0";
     }
-    return value;
+
+    return -value;
 }
 
 function setFloat(value) {
     value = value.toString();
     if (value.endsWith(".")) {
-        value = value.slice(0, -1);
-    } else {
-        value = value.replace(".", "");
-        value += ".";
+        return value.slice(0, -1);
     }
 
-    return value;
+    return parseInt(value.replace(".", "")) + ".";
+}
+
+function percent(value) {
+    if (!isNaN(value) && value != 0) {
+        return value / 100;
+    }
+
+    return "0";
 }
