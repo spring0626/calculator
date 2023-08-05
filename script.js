@@ -58,19 +58,15 @@ function handleSymbolClick(symbol) {
         case "÷":
             isFirstValue = false;
 
-            if (firstValue.toString().endsWith(".")) {
-                firstValue = firstValue.slice(0, -1);
-            }
+            if (firstValue.toString().endsWith(".")) firstValue = firstValue.slice(0, -1);
 
             if (secondValue) {
                 subSc.innerText = getBuffer() + "=";
                 handleOverflow(subSc, 24);
-                firstValue = calculate(firstValue, secondValue, operator).toString();
+                firstValue = calculate(firstValue, secondValue, operator);
                 secondValue = "";
             } else {
-                if (firstValue == "-") {
-                    firstValue += "0";
-                }
+                if (firstValue == "-") firstValue += "0";
                 subSc.innerText = "";
             }
 
@@ -85,7 +81,7 @@ function handleSymbolClick(symbol) {
             if (operator && secondValue) {
                 subSc.innerText = getBuffer() + "=";
                 handleOverflow(subSc, 24);
-                firstValue = calculate(firstValue, secondValue, operator).toString();
+                firstValue = calculate(firstValue, secondValue, operator);
                 isFirstValue = true;
                 secondValue = "";
                 operator = "";
@@ -154,8 +150,15 @@ function calculate(num1, num2, operator) {
             break;
     }
 
-    if (result.toString().length > 6) {
-        result = result.toFixed(6);
+    result = result.toString();
+
+    if (result.includes(".")) {
+        const arr = result.split(".");
+        if (arr[1].length > 6 && parseInt(arr[1]) !== "0") {
+            arr[1] = parseFloat("0." + arr[1]).toFixed(6);
+            arr[1] = arr[1].replace("0.", ".");
+            result = arr[0] + arr[1];
+        }
     }
 
     return result;
