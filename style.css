@@ -14,16 +14,20 @@ body {
 }
 
 .wrapper {
-    padding: 20px;
-    border-radius: 10px;
+    height: 100vh;
     background: rgba(255, 255, 255, 0.3);
-    width: 375px;
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    justify-content: end;
 }
 
 .screen {
     text-align: end;
     margin-bottom: 24px;
     color: #000;
+    margin: 0 8% 16px;
 }
 
 .sub-screen {
@@ -34,6 +38,11 @@ body {
 .main-screen {
     height: 60px;
     font-size: 48px;
+}
+
+.calc-btns {
+    width: 335px;
+    margin: 0 auto 56px;
 }
 
 .calc-btn-row {
